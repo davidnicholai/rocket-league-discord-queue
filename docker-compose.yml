@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  db:
+    image: postgres
+    volumes:
+      - type: volume
+        source: db_data
+        target: /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    env_file: .env.development
+  web:
+    build: .
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    tty: true
+    stdin_open: true
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+    ports:
+      - 8000:8000
+    env_file: .env.development
+    depends_on:
+      - db
+
+volumes:
+  db_data:
